@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_assessments }}</h4>
+                        <p class="card-text">Total Assessments</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clipboard-list fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_questions }}</h4>
+                        <p class="card-text">Total Questions</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-question-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_users }}</h4>
+                        <p class="card-text">Total Users</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_sessions }}</h4>
+                        <p class="card-text">Total Sessions</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 mb-2">
+                        <a href="{% url 'assessments:assessment_create' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-plus"></i> Create Assessment
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <a href="{% url 'assessments:assign_assessment' %}" class="btn btn-success w-100">
+                            <i class="fas fa-user-plus"></i> Assign Assessment
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <a href="{% url 'assessments:question_create' %}" class="btn btn-success w-100">
+                            <i class="fas fa-plus"></i> Add Question
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <a href="{% url 'assessments:assessment_list' %}" class="btn btn-info w-100">
+                            <i class="fas fa-list"></i> View Assessments
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary w-100">
+                            <i class="fas fa-question-circle"></i> View Questions
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <a href="{% url 'assessments:analytics' %}" class="btn btn-warning w-100">
+                            <i class="fas fa-chart-bar"></i> View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Assessments -->
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clipboard-list"></i> Recent Assessments</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_assessments %}
+                    <div class="row">
+                        {% for assessment in recent_assessments %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ assessment.name }}</h6>
+                                    <p class="card-text text-muted">{{ assessment.description|truncatewords:10 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">{{ assessment.assessment_type.name }}</small>
+                                        <span class="badge bg-{% if assessment.is_active %}success{% else %}secondary{% endif %}">
+                                            {% if assessment.is_active %}Active{% else %}Inactive{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{% url 'assessments:assessment_detail' assessment.id %}" class="btn btn-sm btn-outline-primary">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent assessments found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity and Designations -->
+<div class="row mt-4">
+    <!-- Recent Sessions -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Recent Assessment Sessions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_sessions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Assessment</th>
+                                    <th>Status</th>
+                                    <th>Score</th>
+                                    <th>Started</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for session in recent_sessions %}
+                                <tr>
+                                    <td>{{ session.user.username }}</td>
+                                    <td>{{ session.assessment.name }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if session.status == 'completed' %}success{% elif session.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                            {{ session.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if session.percentage_score %}
+                                            {{ session.percentage_score|floatformat:1 }}%
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ session.started_at|date:"M d, Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent sessions found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Designations -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tags"></i> Designations</h5>
+            </div>
+            <div class="card-body">
+                {% if designations %}
+                    {% for designation in designations %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ designation.name }}</span>
+                        <span class="badge bg-primary">{{ designation.assessment_count }} assessments</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 5px;">
+                        <div class="progress-bar" style="width: {{ designation.percentage|floatformat:1 }}%"></div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No designations found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Question - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-trash"></i> Delete Question</h1>
+            <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Questions
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-warning"></i> Warning</h6>
+                    <p class="mb-0">You are about to delete the following question. This action cannot be undone.</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h6>Question Details:</h6>
+                    <div class="border rounded p-3 bg-light">
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Type:</strong> {{ question.get_question_type_display }}
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Text:</strong>
+                            <p class="mb-0">{{ question.text|truncatewords:30 }}</p>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Assessment Type:</strong> {{ question.assessment_type.name }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Category:</strong> {{ question.category.name|default:"Not categorized" }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Impact Analysis</h6>
+                    <ul class="mb-0">
+                        <li>This question will be removed from <strong>{{ question.assessment_questions.count }}</strong> assessment(s)</li>
+                        <li><strong>{{ question.answers.count }}</strong> answer(s) will be deleted</li>
+                        <li>Assessment scores may be affected</li>
+                    </ul>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete Question
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

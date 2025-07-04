@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Question Management - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-question-circle"></i> Question Management</h1>
+            <div>
+                <a href="{% url 'assessments:question_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Question
+                </a>
+                <a href="{% url 'assessments:bulk_import_questions' %}" class="btn btn-success ms-2">
+                    <i class="fas fa-upload"></i> Bulk Import
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs for Categories (single row: All, IQ, Cultural) -->
+<div class="row mb-3">
+    <div class="col-12">
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link {% if not selected_category_id %}active{% endif %}" href="?">All</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if selected_category_id == iq_category_id %}active{% endif %}" href="?category={{ iq_category_id }}">IQ</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if selected_category_id == cultural_category_id %}active{% endif %}" href="?category={{ cultural_category_id }}">Cultural</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-2">
+                        {{ form.search|as_crispy_field }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.assessment_type|as_crispy_field }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.category|as_crispy_field }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.question_type|as_crispy_field }}
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary mt-4 w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Question List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Questions</h5>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+                                    <th>Points</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for question in page_obj %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ question.text|truncatewords:15 }}</strong>
+                                        <br><small class="text-muted">{{ question.assessment_type.name }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ question.get_question_type_display }}</span>
+                                    </td>
+                                    <td>{{ question.category.name|default:"-" }}</td>
+                                    <td>{{ question.points }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if question.is_active %}success{% else %}secondary{% endif %}">
+                                            {% if question.is_active %}Active{% else %}Inactive{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'assessments:question_detail' question.id %}" class="btn btn-sm btn-outline-primary" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'assessments:question_edit' question.id %}" class="btn btn-sm btn-outline-warning" title="Edit Question">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'assessments:question_delete' question.id %}" class="btn btn-sm btn-outline-danger" title="Delete Question">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Question pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No questions found.</p>
+                        <a href="{% url 'assessments:question_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Your First Question
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

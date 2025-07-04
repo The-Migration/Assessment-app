@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Results - The Migration{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4"><i class="fas fa-clipboard-check"></i> Assessment Results</h1>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Assessment: {{ session.assessment.name }}</h4>
+            <p><strong>Status:</strong> {{ session.get_status_display }}</p>
+            <p><strong>Score:</strong> {{ session.score|default:'-' }} / {{ session.total_points|default:'-' }}</p>
+            <p><strong>Percentage:</strong> {{ session.percentage_score|floatformat:2 }}%</p>
+            <p><strong>Passed:</strong> {% if session.passed %}<span class="text-success">Yes</span>{% else %}<span class="text-danger">No</span>{% endif %}</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h5>Your Answers</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Question</th>
+                        <th>Your Answer</th>
+                        <th>Correct?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for answer in answers %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ answer.question.text }}</td>
+                        <td>{{ answer.response }}</td>
+                        <td>
+                            {% if answer.is_correct %}
+                                <span class="text-success">Yes</span>
+                            {% elif answer.is_correct is not None %}
+                                <span class="text-danger">No</span>
+                            {% else %}
+                                <span class="text-muted">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'assessments:candidate_portal' %}" class="btn btn-primary">Back to Portal</a>
+    </div>
+</div>
+{% endblock %} 

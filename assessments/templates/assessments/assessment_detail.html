@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ assessment.name }} - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-clipboard-list"></i> {{ assessment.name }}</h1>
+            <div>
+                <a href="{% url 'assessments:assessment_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Assessments
+                </a>
+                <a href="{% url 'assessments:assessment_edit' assessment.id %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessment Overview -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Assessment Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Type:</strong> {{ assessment.assessment_type.name }}</p>
+                        <p><strong>Time Limit:</strong> {{ assessment.time_limit_minutes }} minutes</p>
+                        <p><strong>Passing Score:</strong> {{ assessment.pass_threshold }}%</p>
+                        <p><strong>Max Attempts:</strong> {{ assessment.max_attempts }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{% if assessment.is_active %}success{% else %}secondary{% endif %}">
+                                {% if assessment.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </p>
+                        <p><strong>Allow Retake:</strong> 
+                            <span class="badge bg-{% if assessment.allow_retake %}success{% else %}secondary{% endif %}">
+                                {% if assessment.allow_retake %}Yes{% else %}No{% endif %}
+                            </span>
+                        </p>
+                        <p><strong>Show Results:</strong> 
+                            <span class="badge bg-{% if assessment.show_results_immediately %}success{% else %}secondary{% endif %}">
+                                {% if assessment.show_results_immediately %}Immediately{% else %}Later{% endif %}
+                            </span>
+                        </p>
+                        <p><strong>Randomize:</strong> 
+                            <span class="badge bg-{% if assessment.randomize_questions %}success{% else %}secondary{% endif %}">
+                                {% if assessment.randomize_questions %}Yes{% else %}No{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                {% if assessment.description %}
+                <div class="mt-3">
+                    <h6>Description:</h6>
+                    <p>{{ assessment.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-primary">{{ questions.count }}</h4>
+                        <small class="text-muted">Questions</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success">{{ sessions.count }}</h4>
+                        <small class="text-muted">Sessions</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-info">{{ assessment.total_points }}</h4>
+                        <small class="text-muted">Total Points</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-warning">{{ assessment.estimated_time }}</h4>
+                        <small class="text-muted">Est. Time (min)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'assessments:add_existing_question' assessment.id %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Questions
+                    </a>
+                    <a href="{% url 'assessments:assign_assessment' %}" class="btn btn-success">
+                        <i class="fas fa-users"></i> Assign to Candidates
+                    </a>
+                    <a href="#recent-sessions" class="btn btn-info">
+                        <i class="fas fa-chart-line"></i> View Results
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Questions Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-question-circle"></i> Questions ({{ questions.count }})</h5>
+                <div>
+                    <a href="{% url 'assessments:question_create' %}?assessment_id={{ assessment.id }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create New Question
+                    </a>
+                    <a href="{% url 'assessments:add_existing_question' assessment.id %}" class="btn btn-secondary ms-2">
+                        <i class="fas fa-link"></i> Add Existing Question
+                    </a>
+                    <a href="{% url 'assessments:bulk_import_questions_for_assessment' assessment.id %}" class="btn btn-success ms-2">
+                        <i class="fas fa-upload"></i> Bulk Import Questions
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if questions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Question</th>
+                                    <th>Type</th>
+                                    <th>Points</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for aq in questions %}
+                                <tr>
+                                    <td>{{ aq.order }}</td>
+                                    <td>
+                                        <strong>{{ aq.question.text|truncatewords:15 }}</strong>
+                                        <br><small class="text-muted">{{ aq.question.get_question_type_display }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ aq.question.get_question_type_display }}</span>
+                                    </td>
+                                    <td>{{ aq.question.points }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'assessments:question_detail' aq.question.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'assessments:question_edit' aq.question.id %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'assessments:remove_assessment_question' aq.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No questions added to this assessment yet.</p>
+                        <a href="#" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Your First Question
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sessions -->
+<div class="row" id="recent-sessions">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Recent Sessions</h5>
+            </div>
+            <div class="card-body">
+                {% if sessions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Status</th>
+                                    <th>Score</th>
+                                    <th>Duration</th>
+                                    <th>Started</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for session in sessions %}
+                                <tr>
+                                    <td>{{ session.user.username }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if session.status == 'completed' %}success{% elif session.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                            {{ session.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if session.percentage_score %}
+                                            <span class="badge bg-{% if session.percentage_score >= 80 %}success{% elif session.percentage_score >= 60 %}warning{% else %}danger{% endif %}">
+                                                {{ session.percentage_score|floatformat:1 }}%
+                                            </span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if session.time_taken_minutes %}
+                                            {{ session.time_taken_minutes }} min
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ session.started_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'assessments:session_detail' session.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No sessions found for this assessment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

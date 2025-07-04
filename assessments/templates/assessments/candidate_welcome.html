@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Assessment Portal{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-primary mb-3">
+                    <i class="fas fa-graduation-cap"></i> Welcome to The Migration Assessment Portal
+                </h1>
+                <p class="lead text-muted">
+                    Take your skills assessment and showcase your abilities. 
+                    Join thousands of candidates who have already taken their assessments.
+                </p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body text-center">
+                            <div class="mb-4">
+                                <i class="fas fa-user-plus fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="card-title text-primary">New Candidate?</h4>
+                            <p class="card-text">
+                                Create your account to get started with your assessment. 
+                                It only takes a few seconds to sign up.
+                            </p>
+                            <a href="{% url 'users:candidate_signup' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Get Started - Sign Up
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 border-secondary">
+                        <div class="card-body text-center">
+                            <div class="mb-4">
+                                <i class="fas fa-sign-in-alt fa-3x text-secondary"></i>
+                            </div>
+                            <h4 class="card-title text-secondary">Already Registered?</h4>
+                            <p class="card-text">
+                                Welcome back! Log in to continue your assessment 
+                                or view your previous results.
+                            </p>
+                            <a href="{% url 'users:candidate_name_login' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-info-circle text-info"></i> How it Works
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <div class="mb-3">
+                                        <span class="badge bg-primary rounded-pill fs-6">1</span>
+                                    </div>
+                                    <h6>Sign Up</h6>
+                                    <p class="small text-muted">Create your account with just your name</p>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div class="mb-3">
+                                        <span class="badge bg-primary rounded-pill fs-6">2</span>
+                                    </div>
+                                    <h6>Take Assessment</h6>
+                                    <p class="small text-muted">Complete your skills assessment</p>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div class="mb-3">
+                                        <span class="badge bg-primary rounded-pill fs-6">3</span>
+                                    </div>
+                                    <h6>View Results</h6>
+                                    <p class="small text-muted">Get your assessment results instantly</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Admin Access Section -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <hr class="my-4">
+                    <small class="text-muted">
+                        <i class="fas fa-user-shield"></i> 
+                        <strong>Administrator Access:</strong>
+                        <a href="{% url 'admin_login' %}" class="text-decoration-none mx-2">
+                            <strong>Login</strong>
+                        </a>
+                        |
+                        <a href="{% url 'users:admin_signup' %}" class="text-decoration-none mx-2">
+                            <strong>Create Account</strong>
+                        </a>
+                        <br>
+                        <span class="text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Restricted to authorized email only
+                        </span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

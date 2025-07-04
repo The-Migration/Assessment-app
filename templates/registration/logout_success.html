@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white text-center">
+                <h4><i class="fas fa-sign-out-alt"></i> Successfully Logged Out</h4>
+            </div>
+            <div class="card-body text-center">
+                {% if user_was_admin %}
+                    <p class="lead">You have been successfully logged out from the admin panel.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        To access the admin panel again, please use your admin credentials.
+                    </div>
+                    <a href="{% url 'admin_login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Admin Login
+                    </a>
+                {% else %}
+                    <p class="lead">You have been successfully logged out.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Thank you for using the assessment portal.
+                    </div>
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Login Again
+                    </a>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-link">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary">
+                                    <i class="fas fa-user-shield"></i> Admin Access
+                                </h6>
+                                <p class="card-text small">Login with username & password</p>
+                                <a href="{% url 'admin_login' %}" class="btn btn-outline-primary btn-sm">
+                                    Admin Login
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100 border-secondary">
+                            <div class="card-body">
+                                <h6 class="card-title text-secondary">
+                                    <i class="fas fa-user"></i> Candidate Access
+                                </h6>
+                                <p class="card-text small">Login with first & last name</p>
+                                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm">
+                                    Candidate Login
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Import Questions - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-upload"></i> Bulk Import Questions</h5>
+            </div>
+            <div class="card-body">
+                {% if preview_mode %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Preview Questions to Import</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>x
+                                        <tr>
+                                            <th><input type="checkbox" id="select_all" checked onclick="for(let cb of document.querySelectorAll('.select-row')){cb.checked=this.checked}"></th>
+                                            <th>Text</th>
+                                            <th>Type</th>
+                                            <th>Options</th>
+                                            <th>Answer</th>
+                                            <th>Points</th>
+                                            <th>Designation</th>
+                                            <th>Category</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for q in preview_questions %}
+                                        <tr>
+                                            <td><input type="checkbox" class="select-row" name="selected_rows" value="{{ q.row }}" checked></td>
+                                            <td>{{ q.text }}</td>
+                                            <td>{{ q.question_type }}</td>
+                                            <td>{{ q.options }}</td>
+                                            <td>{{ q.correct_answer }}</td>
+                                            <td>{{ q.points }}</td>
+                                            <td>{{ q.designation }}</td>
+                                            <td>{{ q.category }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="submit" name="import_selected" class="btn btn-success"><i class="fas fa-upload"></i> Import Selected</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_file" class="form-label">CSV File</label>
+                        {{ form.file }}
+                        <div class="form-text">
+                            The CSV should have columns: <code>text, question_type, options, correct_answer, points, designation, category</code>.<br>
+                            <b>Note:</b> <code>category</code> should be either <code>IQ</code> or <code>Cultural</code>.<br>
+                            For MCQ, <code>options</code> should be a JSON array (e.g. ["A","B","C"]) or comma-separated.<br>
+                            <b>Example:</b><br>
+                            <code>What is 2+2?,MCQ,"[\"2\",\"3\",\"4\",\"5\"]",4,1,Executive,IQ</code>
+                        </div>
+                    </div>
+                    {% if assessment_id %}
+                        <input type="hidden" name="assessment_id" value="{{ assessment_id }}">
+                    {% endif %}
+                    <button type="submit" name="preview" class="btn btn-primary"><i class="fas fa-upload"></i> Preview</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% if success_count or error_rows %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Import Results</h5>
+            </div>
+            <div class="card-body">
+                {% if success_count %}
+                    <div class="alert alert-success">Successfully imported {{ success_count }} questions.</div>
+                {% endif %}
+                {% if error_rows %}
+                    <div class="alert alert-danger">Errors in {{ error_rows|length }} row(s):</div>
+                    <ul>
+                        {% for err in error_rows %}
+                        <li>Row {{ err.row }}: {{ err.error }} ({{ err.data }})</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% if form_errors %}
+        <div class="alert alert-danger">
+            <strong>Form Error:</strong>
+            <ul>
+            {% for field, errors in form_errors.items %}
+                <li>{{ field }}: {{ errors|join:', ' }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

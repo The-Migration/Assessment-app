@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load assessment_extras %}
+
+{% block title %}Take Assessment - The Migration{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4"><i class="fas fa-pen"></i> Take Assessment</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <span class="badge bg-primary">Question {{ answered_count|add:1 }} of {{ total_questions }}</span>
+            <span class="ms-3">Progress: {{ progress|floatformat:0 }}%</span>
+        </div>
+        <div>
+            <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Time Left: {{ remaining_minutes|floatformat:0 }} min</span>
+        </div>
+    </div>
+    <form method="post" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="question_id" value="{{ current_question.id }}">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="mb-3">{{ current_question.text }}</h5>
+                {% if current_question.question_type == 'MCQ' %}
+                    {% for option in current_question.get_options_list %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="response" id="option{{ forloop.counter }}" value="{{ option }}" {% if answers_dict|lookup:current_question.id == option %}checked{% endif %} required>
+                            <label class="form-check-label" for="option{{ forloop.counter }}">{{ option }}</label>
+                        </div>
+                    {% endfor %}
+                {% elif current_question.question_type == 'TF' %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="response" id="true" value="True" {% if answers_dict|lookup:current_question.id == 'True' %}checked{% endif %} required>
+                        <label class="form-check-label" for="true">True</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="response" id="false" value="False" {% if answers_dict|lookup:current_question.id == 'False' %}checked{% endif %} required>
+                        <label class="form-check-label" for="false">False</label>
+                    </div>
+                {% elif current_question.question_type == 'SA' %}
+                    <textarea class="form-control" name="response" rows="3" required>{{ answers_dict|lookup:current_question.id }}</textarea>
+                {% elif current_question.question_type == 'LA' %}
+                    <textarea class="form-control" name="response" rows="6" required>{{ answers_dict|lookup:current_question.id }}</textarea>
+                {% elif current_question.question_type == 'NUM' %}
+                    <input type="number" class="form-control" name="response" value="{{ answers_dict|lookup:current_question.id }}" required>
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'assessments:candidate_portal' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Exit</a>
+            {% if next_question_index < total_questions %}
+                <button type="submit" class="btn btn-primary">Save &amp; Next</button>
+            {% else %}
+                <a href="{% url 'assessments:submit_assessment' session.id %}" class="btn btn-success">Submit Assessment</a>
+            {% endif %}
+        </div>
+    </form>
+    {% if answered_count == total_questions %}
+        <div class="alert alert-success mt-4">You have answered all questions. Please submit your assessment.</div>
+    {% endif %}
+</div>
+{% endblock %} 

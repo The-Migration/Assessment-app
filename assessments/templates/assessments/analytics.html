@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+            <div>
+                <a href="{% url 'assessments:admin_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_completed_sessions }}</h4>
+                        <p class="card-text">Completed Sessions</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ average_score|floatformat:1 }}%</h4>
+                        <p class="card-text">Average Score</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ pass_rate|floatformat:1 }}%</h4>
+                        <p class="card-text">Pass Rate</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-trophy fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_candidates }}</h4>
+                        <p class="card-text">Active Candidates</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessment Performance -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Assessment Performance</h5>
+            </div>
+            <div class="card-body">
+                {% if assessment_performance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Assessment</th>
+                                    <th>Type</th>
+                                    <th>Completed</th>
+                                    <th>Average Score</th>
+                                    <th>Pass Rate</th>
+                                    <th>Avg Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assessment in assessment_performance %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ assessment.name }}</strong>
+                                        <br><small class="text-muted">{{ assessment.description|truncatewords:10 }}</small>
+                                    </td>
+                                    <td>{{ assessment.assessment_type.name }}</td>
+                                    <td>{{ assessment.completed_count }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2">{{ assessment.avg_score|floatformat:1 }}%</span>
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar" style="width: {{ assessment.avg_score }}%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if assessment.pass_rate >= 80 %}success{% elif assessment.pass_rate >= 60 %}warning{% else %}danger{% endif %}">
+                                            {{ assessment.pass_rate|floatformat:1 }}%
+                                        </span>
+                                    </td>
+                                    <td>{{ assessment.avg_time|floatformat:0 }} min</td>
+                                    <td>
+                                        <a href="{% url 'assessments:assessment_detail' assessment.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-chart-line"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No assessment performance data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Results and Question Analysis -->
+<div class="row">
+    <!-- Recent Results -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Recent Assessment Results</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_results %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Assessment</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Completed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in recent_results %}
+                                <tr>
+                                    <td>{{ result.user.username }}</td>
+                                    <td>{{ result.assessment.name }}</td>
+                                    <td>{{ result.score|default:'-' }}</td>
+                                    <td>{{ result.total_points|default:'-' }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if result.percentage_score >= 80 %}success{% elif result.percentage_score >= 60 %}warning{% else %}danger{% endif %}">
+                                            {{ result.percentage_score|floatformat:1 }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if result.passed %}success{% else %}danger{% endif %}">
+                                            {% if result.passed %}Passed{% else %}Failed{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>{{ result.duration_minutes|floatformat:0 }} min</td>
+                                    <td>{{ result.completed_at|date:"M d, Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent results found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- Export Data Card in right column -->
+    <div class="col-md-4">
+        <div class="card mt-0">
+            <div class="card-header">
+                <h5><i class="fas fa-download"></i> Export Data</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'assessments:export_assessment_results_excel' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-excel"></i> Export to Excel
+                    </a>
+                    <a href="{% url 'assessments:export_assessment_results_pdf' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-file-pdf"></i> Export to PDF
+                    </a>
+                    <a href="{% url 'assessments:analytics_report' %}" class="btn btn-outline-info">
+                        <i class="fas fa-chart-bar"></i> Generate Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

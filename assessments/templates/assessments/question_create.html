@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Question - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-plus"></i> Add Question</h1>
+            <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Questions
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit"></i> Question Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.assessment_type|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.category|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.question_type|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    {{ form.text|as_crispy_field }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.points|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.is_active|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <!-- Answer options (for multiple choice) -->
+                    <div id="answer-options" style="display: none;">
+                        <h6 class="mt-3">Answer Options</h6>
+                        <div id="options-container">
+                            <div class="row mb-2">
+                                <div class="col-md-8">
+                                    <input type="text" name="option_1" class="form-control" placeholder="Option 1">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-check">
+                                        <input type="radio" name="correct_answer" value="1" class="form-check-input">
+                                        <label class="form-check-label">Correct</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-option">Remove</button>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-8">
+                                    <input type="text" name="option_2" class="form-control" placeholder="Option 2">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-check">
+                                        <input type="radio" name="correct_answer" value="2" class="form-check-input">
+                                        <label class="form-check-label">Correct</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-option">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="add-option" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus"></i> Add Option
+                        </button>
+                    </div>
+                    
+                    <!-- Correct answer (for other types) -->
+                    <div id="correct-answer" style="display: none;">
+                        {{ form.correct_answer|as_crispy_field }}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Question
+                        </button>
+                        <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Question Types</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Multiple Choice:</strong> Choose from options
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>True/False:</strong> Simple yes/no questions
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Short Answer:</strong> Text-based responses
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Essay:</strong> Long-form responses
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-lightbulb"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        Write clear, unambiguous questions
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        Assign reasonable point values
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        Categorize questions properly
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelect = document.getElementById('id_question_type');
+    const answerOptions = document.getElementById('answer-options');
+    const correctAnswer = document.getElementById('correct-answer');
+    const addOptionBtn = document.getElementById('add-option');
+    const optionsContainer = document.getElementById('options-container');
+    
+    function toggleAnswerFields() {
+        const selectedType = questionTypeSelect.value;
+        if (selectedType === 'multiple_choice') {
+            answerOptions.style.display = 'block';
+            correctAnswer.style.display = 'none';
+        } else {
+            answerOptions.style.display = 'none';
+            correctAnswer.style.display = 'block';
+        }
+    }
+    
+    questionTypeSelect.addEventListener('change', toggleAnswerFields);
+    toggleAnswerFields();
+    
+    addOptionBtn.addEventListener('click', function() {
+        const optionCount = optionsContainer.children.length + 1;
+        const newOption = document.createElement('div');
+        newOption.className = 'row mb-2';
+        newOption.innerHTML = `
+            <div class="col-md-8">
+                <input type="text" name="option_${optionCount}" class="form-control" placeholder="Option ${optionCount}">
+            </div>
+            <div class="col-md-2">
+                <div class="form-check">
+                    <input type="radio" name="correct_answer" value="${optionCount}" class="form-check-input">
+                    <label class="form-check-label">Correct</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-sm btn-outline-danger remove-option">Remove</button>
+            </div>
+        `;
+        optionsContainer.appendChild(newOption);
+    });
+    
+    optionsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-option')) {
+            e.target.closest('.row').remove();
+        }
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Question Details - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-question-circle"></i> Question Details</h1>
+            <div>
+                <a href="{% url 'assessments:question_edit' question.id %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit Question
+                </a>
+                <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Questions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Question Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Assessment Type:</strong>
+                        <p>{{ question.assessment_type.name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Category:</strong>
+                        <p>{{ question.category.name|default:"Not categorized" }}</p>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Question Type:</strong>
+                        <p><span class="badge bg-info">{{ question.get_question_type_display }}</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Difficulty:</strong>
+                        <p>
+                            <span class="badge bg-{% if question.difficulty == 'easy' %}success{% elif question.difficulty == 'medium' %}warning{% else %}danger{% endif %}">
+                                {{ question.get_difficulty_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Points:</strong>
+                        <p>{{ question.points }} points</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Status:</strong>
+                        <p>
+                            <span class="badge bg-{% if question.is_active %}success{% else %}secondary{% endif %}">
+                                {% if question.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Question Text:</strong>
+                    <div class="border rounded p-3 bg-light">
+                        {{ question.text|linebreaks }}
+                    </div>
+                </div>
+                
+                {% if question.question_type == 'MCQ' and question.options %}
+                <div class="mb-3">
+                    <strong>Options:</strong>
+                    <div class="border rounded p-3 bg-light">
+                        <ul class="list-unstyled">
+                            {% for option in question.get_options_list %}
+                            <li class="mb-2">
+                                <i class="fas fa-circle text-muted me-2"></i>
+                                {{ option }}
+                                {% if option == question.correct_answer %}
+                                    <span class="badge bg-success ms-2">Correct Answer</span>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="mb-3">
+                    <strong>Correct Answer:</strong>
+                    <div class="border rounded p-3 bg-light">
+                        {{ question.correct_answer|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if question.explanation %}
+                <div class="mb-3">
+                    <strong>Explanation:</strong>
+                    <div class="border rounded p-3 bg-light">
+                        {{ question.explanation|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Usage Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Times Used:</strong>
+                    <p>{{ question.assessment_questions.count }} assessments</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Times Answered:</strong>
+                    <p>{{ question.answers.count }} times</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Success Rate:</strong>
+                    <p>
+                        {% if total_count > 0 %}
+                            {% widthratio correct_count total_count 100 %}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <strong>Created:</strong>
+                    <p>{{ question.created_at|date:"M d, Y H:i" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Last Updated:</strong>
+                    <p>{{ question.updated_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Deleting this question will remove it from all assessments and cannot be undone.</p>
+                <a href="{% url 'assessments:question_delete' question.id %}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i> Delete Question
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

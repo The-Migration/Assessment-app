@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Admin Login - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white text-center">
+                <h4><i class="fas fa-user-shield"></i> Authorized Admin Login</h4>
+            </div>
+            <div class="card-body">
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Login failed!</strong> Please check your credentials or contact the system administrator.
+                    </div>
+                {% endif %}
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Restricted Access:</strong> Only authorized administrators with approved email addresses can access this system.
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-sign-in-alt"></i> Admin Login
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <a href="{% url 'users:password_reset' %}" class="text-decoration-none">
+                        <i class="fas fa-key"></i> Forgot Password?
+                    </a>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <p class="mb-2">
+                        <small class="text-muted">Don't have an admin account?</small>
+                    </p>
+                    <a href="{% url 'users:admin_signup' %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-user-plus"></i> Create Admin Account
+                    </a>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        For candidates, use the <a href="{% url 'login' %}">candidate login</a> instead.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

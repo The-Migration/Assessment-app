@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Get Started - Candidate Signup{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4><i class="fas fa-user-plus"></i> Get Started - Create Your Account</h4>
+                    <p class="mb-0 small">Step 1 of 3: Sign Up</p>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Welcome!</strong> Just enter your name to create your account and get started.
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary w-100 btn-lg">
+                            <i class="fas fa-user-plus"></i> Create Account & Continue
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Already have an account? 
+                            <a href="{% url 'users:candidate_name_login' %}" class="text-decoration-none">Login here</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

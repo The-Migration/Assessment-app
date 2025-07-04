@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Completed - The Migration{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-4">Assessment Completed Successfully!</h2>
+                    
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-clipboard-check"></i> {{ session.assessment.name }}</h5>
+                        <p class="mb-0">Thank you for completing your assessment. Your responses have been submitted successfully.</p>
+                    </div>
+                    
+                    <div class="row text-center mt-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-clock text-primary"></i> Time Taken
+                                    </h6>
+                                    <p class="card-text">
+                                        {% if session.time_taken_minutes %}
+                                            {{ session.time_taken_minutes }} minutes
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-calendar text-primary"></i> Submitted On
+                                    </h6>
+                                    <p class="card-text">
+                                        {{ session.completed_at|date:"M d, Y H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>What's Next?</strong><br>
+                            Your assessment has been submitted for review. The results will be evaluated by our team. 
+                            You will be contacted regarding the outcome through your registered contact information.
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'assessments:candidate_portal' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home"></i> Back to Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

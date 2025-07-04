@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Assessment - The Migration{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="fas fa-user-plus"></i> Assign Assessment to Candidate</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.candidate.id_for_label }}" class="form-label">
+                                {{ form.candidate.label }}
+                            </label>
+                            {{ form.candidate }}
+                            {% if form.candidate.help_text %}
+                                <div class="form-text">{{ form.candidate.help_text }}</div>
+                            {% endif %}
+                            {% if form.candidate.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.candidate.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.assessment.id_for_label }}" class="form-label">
+                                {{ form.assessment.label }}
+                            </label>
+                            {{ form.assessment }}
+                            {% if form.assessment.help_text %}
+                                <div class="form-text">{{ form.assessment.help_text }}</div>
+                            {% endif %}
+                            {% if form.assessment.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.assessment.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'assessments:admin_dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Assign Assessment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

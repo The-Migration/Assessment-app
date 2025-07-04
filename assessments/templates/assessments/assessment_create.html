@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Assessment - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-plus"></i> Create Assessment</h1>
+            <a href="{% url 'assessments:assessment_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Assessments
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit"></i> Assessment Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.assessment_type|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.time_limit_minutes|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.pass_threshold|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    {{ form.description|as_crispy_field }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.is_active|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.allow_retake|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.show_results_immediately|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.randomize_questions|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Assessment
+                        </button>
+                        <a href="{% url 'assessments:assessment_list' %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Name:</strong> Choose a clear, descriptive name
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Type:</strong> Select the appropriate assessment type
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Time Limit:</strong> Set reasonable time limits
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Passing Score:</strong> Define clear success criteria
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Description:</strong> Provide clear instructions
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-question-circle"></i> Next Steps</h5>
+            </div>
+            <div class="card-body">
+                <p>After creating the assessment, you can:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-1">
+                        <i class="fas fa-plus text-primary"></i> Add questions
+                    </li>
+                    <li class="mb-1">
+                        <i class="fas fa-users text-primary"></i> Assign to candidates
+                    </li>
+                    <li class="mb-1">
+                        <i class="fas fa-chart-bar text-primary"></i> View results
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

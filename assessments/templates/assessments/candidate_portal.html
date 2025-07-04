@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Portal - Step 3{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> 
+            <strong>Step 3 of 3: Take Your Assessment</strong> - You're all set! Choose an assessment below to get started.
+        </div>
+        
+        <h1 class="mb-4">
+            <i class="fas fa-home"></i> Welcome, {{ user.get_full_name|default:user.username }}!
+        </h1>
+    </div>
+</div>
+
+<!-- Available Assessments -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clipboard-list"></i> Available Assessments</h5>
+            </div>
+            <div class="card-body">
+                {% if available_assessments %}
+                    <div class="row">
+                        {% for assessment in available_assessments %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ assessment.name }}</h6>
+                                    <p class="card-text text-muted">{{ assessment.description|truncatewords:15 }}</p>
+                                    
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock"></i> {{ assessment.time_limit_minutes }} min
+                                            </small>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">
+                                                <i class="fas fa-question-circle"></i> {{ assessment.get_question_count }} questions
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <small class="text-muted">
+                                                <i class="fas fa-percentage"></i> Pass: {{ assessment.pass_threshold }}%
+                                            </small>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">
+                                                <i class="fas fa-redo"></i> {{ assessment.attempts_remaining }} attempts left
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if assessment.last_attempt %}
+                                    <div class="alert alert-info py-2 mb-3">
+                                        <small>
+                                            <i class="fas fa-info-circle"></i> 
+                                            Last attempt: {{ assessment.last_attempt.started_at|date:"M d, Y" }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer">
+                                    {% if assessment.in_progress_session %}
+                                        <a href="{% url 'assessments:take_assessment' assessment.in_progress_session.id %}" class="btn btn-warning btn-sm w-100">
+                                            <i class="fas fa-play"></i> Continue Assessment
+                                        </a>
+                                    {% elif assessment.can_take %}
+                                        <a href="{% url 'assessments:start_assessment' assessment.id %}" class="btn btn-primary btn-sm w-100">
+                                            <i class="fas fa-play"></i> Start Assessment
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                                            <i class="fas fa-ban"></i> No Attempts Left
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No assessments are currently available.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessment History -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Your Assessment History</h5>
+            </div>
+            <div class="card-body">
+                {% if user_sessions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Assessment</th>
+                                    <th>Status</th>
+                                    <th>Time Taken</th>
+                                    <th>Started</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for session in user_sessions %}
+                                <tr>
+                                    <td>{{ session.assessment.name }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if session.status == 'completed' %}success{% elif session.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                            {{ session.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if session.time_taken_minutes %}
+                                            {{ session.time_taken_minutes }} min
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ session.started_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        {% if session.status == 'completed' %}
+                                            <span class="text-success">
+                                                <i class="fas fa-check-circle"></i> Submitted
+                                            </span>
+                                        {% elif session.status == 'in_progress' %}
+                                            <a href="{% url 'assessments:take_assessment' session.id %}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-play"></i> Continue
+                                            </a>
+                                        {% elif session.status == 'not_started' %}
+                                            <a href="{% url 'assessments:begin_assigned_session' session.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-play"></i> Start
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">You haven't taken any assessments yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

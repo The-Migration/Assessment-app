@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if is_edit %}Edit Question{% else %}Add Question{% endif %} - Assessment System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-{% if is_edit %}edit{% else %}plus{% endif %}"></i> {% if is_edit %}Edit Question{% else %}Add Question{% endif %}</h1>
+            <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Questions
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit"></i> Question Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if request.GET.assessment_id %}
+                        <input type="hidden" name="assessment_id" value="{{ request.GET.assessment_id }}">
+                    {% elif assessment_id %}
+                        <input type="hidden" name="assessment_id" value="{{ assessment_id }}">
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.assessment_type|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.category|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.question_type|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    {{ form.text|as_crispy_field }}
+                    
+                    <!-- Hidden options field for MCQ -->
+                    {{ form.options|as_crispy_field }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.points|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.is_active|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <!-- Answer options (for multiple choice) -->
+                    <div id="answer-options" style="display: none;">
+                        <h6 class="mt-3">Answer Options</h6>
+                        <div id="options-container">
+                            <div class="row mb-2">
+                                <div class="col-md-8">
+                                    <input type="text" name="option_1" class="form-control" placeholder="Option 1">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-check">
+                                        <input type="radio" name="custom_correct_answer" value="1" class="form-check-input">
+                                        <label class="form-check-label">Correct</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-option">Remove</button>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-8">
+                                    <input type="text" name="option_2" class="form-control" placeholder="Option 2">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-check">
+                                        <input type="radio" name="custom_correct_answer" value="2" class="form-check-input">
+                                        <label class="form-check-label">Correct</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-option">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="add-option" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus"></i> Add Option
+                        </button>
+                    </div>
+                    
+                    <!-- Correct answer (for other types) -->
+                    <div id="correct-answer" style="display: none;">
+                        {{ form.correct_answer|as_crispy_field }}
+                    </div>
+                    
+                    {{ form.explanation|as_crispy_field }}
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {% if is_edit %}Update Question{% else %}Add Question{% endif %}
+                        </button>
+                        <a href="{% url 'assessments:question_list' %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Question Types</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Multiple Choice:</strong> Choose from options
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>True/False:</strong> Simple yes/no questions
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Short Answer:</strong> Text-based responses
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Long Answer:</strong> Essay-style responses
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <strong>Numeric:</strong> Number-based answers
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-lightbulb"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        Write clear, unambiguous questions
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        Assign reasonable point values
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        Categorize questions properly
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelect = document.getElementById('id_question_type');
+    const answerOptions = document.getElementById('answer-options');
+    const correctAnswer = document.getElementById('correct-answer');
+    const addOptionBtn = document.getElementById('add-option');
+    const optionsContainer = document.getElementById('options-container');
+    const form = document.querySelector('form');
+    
+    function toggleAnswerFields() {
+        const selectedType = questionTypeSelect.value;
+        const optionsField = document.getElementById('id_options');
+        
+        console.log('Toggling fields for question type:', selectedType);
+        
+        if (selectedType === 'MCQ') {
+            console.log('Showing MCQ interface');
+            answerOptions.style.display = 'block';
+            correctAnswer.style.display = 'none';
+            if (optionsField) {
+                optionsField.style.display = 'none';
+            }
+            // Disable HTML5 validation for MCQ
+            form.setAttribute('novalidate', 'novalidate');
+        } else {
+            console.log('Showing standard interface');
+            answerOptions.style.display = 'none';
+            correctAnswer.style.display = 'block';
+            if (optionsField) {
+                optionsField.style.display = 'block';
+            }
+            // Enable HTML5 validation for other question types
+            form.removeAttribute('novalidate');
+        }
+    }
+    
+    if (questionTypeSelect) {
+        questionTypeSelect.addEventListener('change', toggleAnswerFields);
+        toggleAnswerFields();
+    }
+    
+    if (addOptionBtn) {
+        addOptionBtn.addEventListener('click', function() {
+            const optionCount = optionsContainer.children.length + 1;
+            const newOption = document.createElement('div');
+            newOption.className = 'row mb-2';
+            newOption.innerHTML = `
+                <div class="col-md-8">
+                    <input type="text" name="option_${optionCount}" class="form-control" placeholder="Option ${optionCount}">
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input type="radio" name="custom_correct_answer" value="${optionCount}" class="form-check-input">
+                        <label class="form-check-label">Correct</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-option">Remove</button>
+                </div>
+            `;
+            optionsContainer.appendChild(newOption);
+        });
+    }
+    
+    if (optionsContainer) {
+        optionsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-option')) {
+                e.target.closest('.row').remove();
+            }
+        });
+    }
+    
+    // Handle form submission for MCQ questions
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const selectedType = questionTypeSelect.value;
+            console.log('Form submitted, question type:', selectedType);
+            
+            if (selectedType === 'MCQ') {
+                console.log('Processing MCQ question...');
+                
+                // Collect options
+                const optionInputs = optionsContainer.querySelectorAll('input[type="text"]');
+                console.log('Found option inputs:', optionInputs.length);
+                
+                const options = [];
+                let correctAnswerText = '';
+                let correctAnswerIndex = -1;
+                
+                // Get the selected correct answer
+                const selectedCorrect = document.querySelector('input[name="custom_correct_answer"]:checked');
+                console.log('Selected correct answer:', selectedCorrect);
+                
+                if (selectedCorrect) {
+                    correctAnswerIndex = parseInt(selectedCorrect.value) - 1;
+                    console.log('Correct answer index:', correctAnswerIndex);
+                }
+                
+                // Collect all options
+                optionInputs.forEach((input, index) => {
+                    const optionText = input.value.trim();
+                    console.log(`Option ${index}: "${optionText}"`);
+                    if (optionText) {
+                        options.push(optionText);
+                        if (index === correctAnswerIndex) {
+                            correctAnswerText = optionText;
+                        }
+                    }
+                });
+                
+                console.log('Collected options:', options);
+                console.log('Correct answer text:', correctAnswerText);
+                
+                // Validate MCQ requirements
+                if (options.length < 2) {
+                    e.preventDefault();
+                    alert('Please provide at least 2 options for MCQ questions.');
+                    return;
+                }
+                
+                if (!correctAnswerText) {
+                    e.preventDefault();
+                    alert('Please select a correct answer for MCQ questions.');
+                    return;
+                }
+                
+                // Create hidden fields for options and correct answer
+                let optionsField = document.getElementById('id_options');
+                if (!optionsField) {
+                    optionsField = document.createElement('input');
+                    optionsField.type = 'hidden';
+                    optionsField.name = 'options';
+                    optionsField.id = 'id_options';
+                    form.appendChild(optionsField);
+                    console.log('Created options field');
+                }
+                optionsField.value = JSON.stringify(options);
+                
+                // For MCQ, remove the original textarea and submit only the hidden input
+                let correctAnswerField = document.getElementById('id_correct_answer');
+                if (correctAnswerField) {
+                    // Remove the original textarea for MCQ so only the hidden input is submitted
+                    correctAnswerField.parentNode.removeChild(correctAnswerField);
+                }
+                
+                // Create a hidden input with the correct answer
+                let hiddenCorrectAnswer = document.createElement('input');
+                hiddenCorrectAnswer.type = 'hidden';
+                hiddenCorrectAnswer.name = 'correct_answer';
+                hiddenCorrectAnswer.value = correctAnswerText;
+                form.appendChild(hiddenCorrectAnswer);
+                console.log('Created hidden correct answer field');
+                
+                // Debug: Log the values being set
+                console.log('Final options:', options);
+                console.log('Final correct answer:', correctAnswerText);
+                console.log('Options Field Value:', optionsField.value);
+                console.log('Correct Answer Field Value:', correctAnswerField.value);
+                console.log('Form will submit with these values');
+            } else {
+                console.log('Not MCQ, proceeding with normal form submission');
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 
