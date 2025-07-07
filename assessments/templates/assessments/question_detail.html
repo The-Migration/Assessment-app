@@ -43,27 +43,8 @@
                         <p><span class="badge bg-info">{{ question.get_question_type_display }}</span></p>
                     </div>
                     <div class="col-md-6">
-                        <strong>Difficulty:</strong>
-                        <p>
-                            <span class="badge bg-{% if question.difficulty == 'easy' %}success{% elif question.difficulty == 'medium' %}warning{% else %}danger{% endif %}">
-                                {{ question.get_difficulty_display }}
-                            </span>
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
                         <strong>Points:</strong>
                         <p>{{ question.points }} points</p>
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Status:</strong>
-                        <p>
-                            <span class="badge bg-{% if question.is_active %}success{% else %}secondary{% endif %}">
-                                {% if question.is_active %}Active{% else %}Inactive{% endif %}
-                            </span>
-                        </p>
                     </div>
                 </div>
                 
@@ -152,9 +133,9 @@
                 <h5><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
             </div>
             <div class="card-body">
-                <p class="text-muted small">Deleting this question will remove it from all assessments and cannot be undone.</p>
+                <p class="text-muted small"><strong>Warning:</strong> Deleting this question will <strong>permanently remove</strong> it from all assessments and <strong>cannot be undone</strong>. All historical data will be lost.</p>
                 <a href="{% url 'assessments:question_delete' question.id %}" class="btn btn-danger btn-sm">
-                    <i class="fas fa-trash"></i> Delete Question
+                    <i class="fas fa-trash"></i> Delete Question Permanently
                 </a>
             </div>
         </div>

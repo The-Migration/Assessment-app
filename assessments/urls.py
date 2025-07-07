@@ -29,6 +29,7 @@ urlpatterns = [
     path('admin/analytics/report/', views.analytics_report, name='analytics_report'),
     path('admin/assign-assessment/', views.assign_assessment, name='assign_assessment'),
     path('admin/assessments/<int:assessment_id>/edit/', views.assessment_edit, name='assessment_edit'),
+    path('admin/assessments/<int:assessment_id>/delete/', views.assessment_delete, name='assessment_delete'),
     path('admin/assessment-results/<int:session_id>/', views.assessment_results, name='assessment_results'),
     
     # Candidate views

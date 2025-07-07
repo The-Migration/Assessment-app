@@ -505,12 +505,12 @@ def question_edit(request, question_id):
 
 @admin_required
 def question_delete(request, question_id):
-    """Archive (soft delete) a question by setting is_active=False"""
+    """Delete a question permanently"""
     question = get_object_or_404(Question, id=question_id)
     if request.method == 'POST':
-        question.is_active = False
-        question.save()
-        messages.success(request, "Question archived (soft deleted) successfully!")
+        question_text = question.text[:50]  # Store for success message
+        question.delete()
+        messages.success(request, f"Question '{question_text}...' deleted successfully!")
         return redirect('assessments:question_list')
     context = {
         'question': question,
@@ -876,6 +876,20 @@ def assessment_edit(request, assessment_id):
         form = AssessmentForm(instance=assessment)
     context = {'form': form, 'assessment': assessment, 'is_edit': True}
     return render(request, 'assessments/assessment_form.html', context)
+
+@admin_required
+def assessment_delete(request, assessment_id):
+    """Delete an assessment"""
+    assessment = get_object_or_404(Assessment, id=assessment_id)
+    if request.method == 'POST':
+        assessment_name = assessment.name
+        assessment.delete()
+        messages.success(request, f"Assessment '{assessment_name}' deleted successfully!")
+        return redirect('assessments:assessment_list')
+    context = {
+        'assessment': assessment,
+    }
+    return render(request, 'assessments/assessment_confirm_delete.html', context)
 
 @admin_required
 def export_assessment_results_pdf(request):
