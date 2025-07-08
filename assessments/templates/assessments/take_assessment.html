@@ -37,7 +37,7 @@
                         <input class="form-check-input" type="radio" name="response" id="false" value="False" {% if answers_dict|lookup:current_question.id == 'False' %}checked{% endif %} required>
                         <label class="form-check-label" for="false">False</label>
                     </div>
-                {% elif current_question.question_type == 'SA' %}
+                {% elif current_question.question_type == 'SA' or current_question.question_type == 'Short Answer' %}
                     <textarea class="form-control" name="response" rows="4" placeholder="Enter your answer here..." required>{{ answers_dict|lookup:current_question.id }}</textarea>
                 {% endif %}
             </div>
