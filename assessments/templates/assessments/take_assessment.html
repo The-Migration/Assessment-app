@@ -38,11 +38,7 @@
                         <label class="form-check-label" for="false">False</label>
                     </div>
                 {% elif current_question.question_type == 'SA' %}
-                    <textarea class="form-control" name="response" rows="3" required>{{ answers_dict|lookup:current_question.id }}</textarea>
-                {% elif current_question.question_type == 'LA' %}
-                    <textarea class="form-control" name="response" rows="6" required>{{ answers_dict|lookup:current_question.id }}</textarea>
-                {% elif current_question.question_type == 'NUM' %}
-                    <input type="number" class="form-control" name="response" value="{{ answers_dict|lookup:current_question.id }}" required>
+                    <textarea class="form-control" name="response" rows="4" placeholder="Enter your answer here..." required>{{ answers_dict|lookup:current_question.id }}</textarea>
                 {% endif %}
             </div>
         </div>
