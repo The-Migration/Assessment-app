@@ -43,4 +43,5 @@ urlpatterns = [
     
     # AJAX endpoints
     path('ajax/save-answer/', views.save_answer_ajax, name='save_answer_ajax'),
+    path('questions/bulk-delete/', views.bulk_delete_questions, name='bulk_delete_questions'),
 ]

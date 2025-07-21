@@ -420,6 +420,25 @@ def question_list(request):
     return render(request, 'assessments/question_list.html', context)
 
 @admin_required
+@require_POST
+def bulk_delete_questions(request):
+    """Bulk delete selected questions"""
+    question_ids = request.POST.getlist('question_ids')
+    if not question_ids:
+        messages.error(request, "No questions selected for deletion.")
+        return redirect('assessments:question_list')
+    deleted_count = 0
+    for qid in question_ids:
+        try:
+            question = Question.objects.get(id=qid)
+            question.delete()
+            deleted_count += 1
+        except Question.DoesNotExist:
+            continue
+    messages.success(request, f"Deleted {deleted_count} question(s) successfully!")
+    return redirect('assessments:question_list')
+
+@admin_required
 def question_create(request):
     """Create new question, optionally link to an assessment if designation_id is provided"""
     designation_id = request.GET.get('designation_id') or request.POST.get('designation_id')

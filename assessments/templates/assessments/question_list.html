@@ -79,6 +79,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th><input type="checkbox" id="select-all-questions"></th>
                                     <th>Question</th>
                                     <th>Type</th>
                                     <th>Category</th>
@@ -88,8 +89,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <form id="bulk-delete-form" method="post" action="{% url 'assessments:bulk_delete_questions' %}">
+                                {% csrf_token %}
                                 {% for question in page_obj %}
                                 <tr>
+                                    <td><input type="checkbox" name="question_ids" value="{{ question.id }}" class="select-question"></td>
                                     <td>
                                         <strong>{{ question.text|truncatewords:15 }}</strong>
                                         <br><small class="text-muted">{{ question.assessment_type.name }}</small>
@@ -119,6 +123,7 @@
                                     </td>
                                 </tr>
                                 {% endfor %}
+                                </form>
                             </tbody>
                         </table>
                     </div>
@@ -166,4 +171,22 @@
         </div>
     </div>
 </div>
+{% endblock %} 
+
+{% block extra_js %}
+<script>
+    // Select/Deselect all checkboxes
+    document.getElementById('select-all-questions').addEventListener('change', function() {
+        const checked = this.checked;
+        document.querySelectorAll('.select-question').forEach(cb => cb.checked = checked);
+        document.getElementById('delete-selected-btn').disabled = !checked;
+    });
+    // Enable/disable delete button based on selection
+    document.querySelectorAll('.select-question').forEach(cb => {
+        cb.addEventListener('change', function() {
+            const anyChecked = Array.from(document.querySelectorAll('.select-question')).some(cb => cb.checked);
+            document.getElementById('delete-selected-btn').disabled = !anyChecked;
+        });
+    });
+</script>
 {% endblock %} 
