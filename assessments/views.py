@@ -422,8 +422,10 @@ def question_list(request):
 @admin_required
 @require_POST
 def bulk_delete_questions(request):
-    """Bulk delete selected questions"""
+    print('bulk_delete_questions view called')
+    print('Request method:', request.method)
     question_ids = request.POST.getlist('question_ids')
+    print('Received question_ids:', question_ids)
     if not question_ids:
         messages.error(request, "No questions selected for deletion.")
         return redirect('assessments:question_list')
@@ -434,8 +436,10 @@ def bulk_delete_questions(request):
             question.delete()
             deleted_count += 1
         except Question.DoesNotExist:
+            print(f'Question with id {qid} does not exist')
             continue
     messages.success(request, f"Deleted {deleted_count} question(s) successfully!")
+    print(f'Deleted {deleted_count} questions')
     return redirect('assessments:question_list')
 
 @admin_required
