@@ -5,6 +5,8 @@
 {% block content %}
 <div class="container py-4">
     <h1 class="mb-4"><i class="fas fa-clipboard-check"></i> Assessment Results</h1>
+    
+    <!-- Overall Results Card -->
     <div class="card mb-4">
         <div class="card-body">
             <h4>Assessment: {{ session.assessment.name }}</h4>
@@ -14,15 +16,69 @@
             <p><strong>Passed:</strong> {% if session.passed %}<span class="text-success">Yes</span>{% else %}<span class="text-danger">No</span>{% endif %}</p>
         </div>
     </div>
+    
+    <!-- Category Breakdown Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-chart-pie"></i> Category Breakdown</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-brain"></i> IQ Questions</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            <h3 class="text-primary">{{ iq_correct }}/{{ iq_total }}</h3>
+                            <p class="mb-1"><strong>Correct Answers</strong></p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-primary" role="progressbar" 
+                                     style="width: {{ iq_percentage }}%" 
+                                     aria-valuenow="{{ iq_percentage }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                    {{ iq_percentage|floatformat:1 }}%
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ iq_percentage|floatformat:1 }}% Success Rate</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="fas fa-globe"></i> Cultural Questions</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            <h3 class="text-success">{{ cultural_correct }}/{{ cultural_total }}</h3>
+                            <p class="mb-1"><strong>Correct Answers</strong></p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ cultural_percentage }}%" 
+                                     aria-valuenow="{{ cultural_percentage }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                    {{ cultural_percentage|floatformat:1 }}%
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ cultural_percentage|floatformat:1 }}% Success Rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detailed Answers Card -->
     <div class="card">
         <div class="card-header">
-            <h5>Your Answers</h5>
+            <h5><i class="fas fa-list"></i> Detailed Answers</h5>
         </div>
         <div class="card-body">
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Category</th>
                         <th>Question</th>
                         <th>Your Answer</th>
                         <th>Correct?</th>
@@ -32,15 +88,24 @@
                     {% for answer in answers %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
+                        <td>
+                            {% if answer.question.category %}
+                                <span class="badge {% if answer.question.category.name|lower == 'iq' %}bg-primary{% elif answer.question.category.name|lower == 'cultural' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ answer.question.category.name }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">General</span>
+                            {% endif %}
+                        </td>
                         <td>{{ answer.question.text }}</td>
                         <td>{{ answer.response }}</td>
                         <td>
                             {% if answer.is_correct %}
-                                <span class="text-success">Yes</span>
+                                <span class="text-success"><i class="fas fa-check"></i> Correct</span>
                             {% elif answer.is_correct is not None %}
-                                <span class="text-danger">No</span>
+                                <span class="text-danger"><i class="fas fa-times"></i> Incorrect</span>
                             {% else %}
-                                <span class="text-muted">Pending</span>
+                                <span class="text-muted"><i class="fas fa-clock"></i> Pending</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -49,8 +114,11 @@
             </table>
         </div>
     </div>
+    
     <div class="mt-4">
-        <a href="{% url 'assessments:candidate_portal' %}" class="btn btn-primary">Back to Portal</a>
+        <a href="{% url 'assessments:candidate_portal' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Portal
+        </a>
     </div>
 </div>
 {% endblock %} 

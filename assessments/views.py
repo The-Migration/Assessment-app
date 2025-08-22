@@ -283,11 +283,30 @@ def assessment_results(request, session_id):
     session = get_object_or_404(AssessmentSession, id=session_id)
     
     # Get answers with questions
-    answers = session.answers.select_related('question').all()
+    answers = session.answers.select_related('question', 'question__category').all()
+    
+    # Calculate IQ and Cultural question statistics
+    iq_questions = answers.filter(question__category__name__iexact='IQ')
+    cultural_questions = answers.filter(question__category__name__iexact='Cultural')
+    
+    iq_correct = iq_questions.filter(is_correct=True).count()
+    iq_total = iq_questions.count()
+    cultural_correct = cultural_questions.filter(is_correct=True).count()
+    cultural_total = cultural_questions.count()
+    
+    # Calculate percentages
+    iq_percentage = (iq_correct / iq_total * 100) if iq_total > 0 else 0
+    cultural_percentage = (cultural_correct / cultural_total * 100) if cultural_total > 0 else 0
     
     context = {
         'session': session,
         'answers': answers,
+        'iq_correct': iq_correct,
+        'iq_total': iq_total,
+        'iq_percentage': iq_percentage,
+        'cultural_correct': cultural_correct,
+        'cultural_total': cultural_total,
+        'cultural_percentage': cultural_percentage,
     }
     return render(request, 'assessments/assessment_results.html', context)
 
@@ -560,11 +579,30 @@ def session_list(request):
 def session_detail(request, session_id):
     """View session details and answers"""
     session = get_object_or_404(AssessmentSession, id=session_id)
-    answers = session.answers.select_related('question').all()
+    answers = session.answers.select_related('question', 'question__category').all()
+    
+    # Calculate IQ and Cultural question statistics
+    iq_questions = answers.filter(question__category__name__iexact='IQ')
+    cultural_questions = answers.filter(question__category__name__iexact='Cultural')
+    
+    iq_correct = iq_questions.filter(is_correct=True).count()
+    iq_total = iq_questions.count()
+    cultural_correct = cultural_questions.filter(is_correct=True).count()
+    cultural_total = cultural_questions.count()
+    
+    # Calculate percentages
+    iq_percentage = (iq_correct / iq_total * 100) if iq_total > 0 else 0
+    cultural_percentage = (cultural_correct / cultural_total * 100) if cultural_total > 0 else 0
     
     context = {
         'session': session,
         'answers': answers,
+        'iq_correct': iq_correct,
+        'iq_total': iq_total,
+        'iq_percentage': iq_percentage,
+        'cultural_correct': cultural_correct,
+        'cultural_total': cultural_total,
+        'cultural_percentage': cultural_percentage,
     }
     return render(request, 'assessments/session_detail.html', context)
 

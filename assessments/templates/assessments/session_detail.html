@@ -98,6 +98,68 @@
     </div>
 </div>
 
+<!-- Category Breakdown -->
+{% if iq_total > 0 or cultural_total > 0 %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-pie"></i> Category Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if iq_total > 0 %}
+                    <div class="col-md-6">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0"><i class="fas fa-brain"></i> IQ Questions</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <h3 class="text-primary">{{ iq_correct }}/{{ iq_total }}</h3>
+                                <p class="mb-1"><strong>Correct Answers</strong></p>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                         style="width: {{ iq_percentage }}%" 
+                                         aria-valuenow="{{ iq_percentage }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        {{ iq_percentage|floatformat:1 }}%
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ iq_percentage|floatformat:1 }}% Success Rate</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if cultural_total > 0 %}
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-globe"></i> Cultural Questions</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <h3 class="text-success">{{ cultural_correct }}/{{ cultural_total }}</h3>
+                                <p class="mb-1"><strong>Correct Answers</strong></p>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ cultural_percentage }}%" 
+                                         aria-valuenow="{{ cultural_percentage }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        {{ cultural_percentage|floatformat:1 }}%
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ cultural_percentage|floatformat:1 }}% Success Rate</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Answers -->
 <div class="row">
     <div class="col-12">
@@ -112,7 +174,14 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-8">
-                                    <h6 class="card-title">{{ answer.question.text }}</h6>
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ answer.question.text }}</h6>
+                                        {% if answer.question.category %}
+                                            <span class="badge {% if answer.question.category.name|lower == 'iq' %}bg-primary{% elif answer.question.category.name|lower == 'cultural' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ answer.question.category.name }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                     <p class="text-muted">
                                         <small>
                                             <strong>Type:</strong> {{ answer.question.get_question_type_display }} | 
