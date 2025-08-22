@@ -29,10 +29,8 @@ class QuestionForm(forms.ModelForm):
     def clean_options(self):
         options = self.cleaned_data.get('options')
         question_type = self.cleaned_data.get('question_type')
-        print(f"clean_options called - question_type: {question_type}, options: {options!r}")
         if question_type == 'MCQ':
             if not options or options == 'null':
-                print("MCQ question but no options provided")
                 raise forms.ValidationError("Options are required for Multiple Choice questions.")
             try:
                 import json
@@ -41,12 +39,9 @@ class QuestionForm(forms.ModelForm):
                     options_list = options
                 else:
                     options_list = json.loads(options)
-                print(f"Parsed options: {options_list}")
                 if not isinstance(options_list, list) or len(options_list) < 2:
-                    print(f"Invalid options format: {options_list}")
                     raise forms.ValidationError("At least 2 options are required for MCQ questions.")
             except (json.JSONDecodeError, TypeError) as e:
-                print(f"JSON decode error: {e}")
                 raise forms.ValidationError("Options must be a valid JSON array.")
         return options
 

@@ -298,8 +298,8 @@ def assessment_list(request):
     assessments = Assessment.objects.all()  # Show all by default
 
     if form.is_valid():
-        if form.cleaned_data.get('designation'):
-            assessments = assessments.filter(designation=form.cleaned_data['designation'])
+        if form.cleaned_data.get('assessment_type'):
+            assessments = assessments.filter(assessment_type=form.cleaned_data['assessment_type'])
         if form.cleaned_data.get('search'):
             assessments = assessments.filter(
                 Q(name__icontains=form.cleaned_data['search']) |
@@ -344,28 +344,28 @@ def assessment_detail(request, assessment_id):
     questions = assessment.assessment_questions.select_related('question').order_by('order')
     sessions = assessment.sessions.select_related('user').order_by('-started_at')[:10]
     
+    # Debug information
+    total_questions = questions.count()
+    total_sessions = assessment.sessions.count()
+    
     context = {
         'assessment': assessment,
         'questions': questions,
         'sessions': sessions,
+        'total_questions': total_questions,
+        'total_sessions': total_sessions,
     }
     return render(request, 'assessments/assessment_detail.html', context)
 
 @admin_required
 def question_list(request):
     """Admin view for managing questions"""
-    print('GET parameters:', request.GET)
     form = QuestionSearchForm(request.GET)
-    print('Form is valid:', form.is_valid())
-    if hasattr(form, 'cleaned_data'):
-        print('Cleaned data:', form.cleaned_data)
-    if hasattr(form, 'errors') and form.errors:
-        print('Form errors:', form.errors)
     questions = Question.objects.all()
     
     if form.is_valid():
-        if form.cleaned_data.get('designation'):
-            questions = questions.filter(assessment_type=form.cleaned_data['designation'])
+        if form.cleaned_data.get('assessment_type'):
+            questions = questions.filter(assessment_type=form.cleaned_data['assessment_type'])
         # Custom logic for IQ/Cultural tabs
         category_id = request.GET.get('category')
         if category_id:
@@ -422,10 +422,7 @@ def question_list(request):
 @admin_required
 @require_POST
 def bulk_delete_questions(request):
-    print('bulk_delete_questions view called')
-    print('Request method:', request.method)
     question_ids = request.POST.getlist('question_ids')
-    print('Received question_ids:', question_ids)
     if not question_ids:
         messages.error(request, "No questions selected for deletion.")
         return redirect('assessments:question_list')
@@ -436,10 +433,8 @@ def bulk_delete_questions(request):
             question.delete()
             deleted_count += 1
         except Question.DoesNotExist:
-            print(f'Question with id {qid} does not exist')
             continue
     messages.success(request, f"Deleted {deleted_count} question(s) successfully!")
-    print(f'Deleted {deleted_count} questions')
     return redirect('assessments:question_list')
 
 @admin_required
@@ -450,7 +445,7 @@ def question_create(request):
     if designation_id:
         try:
             designation = Designation.objects.get(id=designation_id)
-            initial['designation'] = designation.designation
+            initial['assessment_type'] = designation
         except Designation.DoesNotExist:
             designation = None
     else:
