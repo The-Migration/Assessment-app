@@ -17,6 +17,11 @@ services:
         fromDatabase:
           name: assessment-db
           property: connectionString
+      - key: RENDER
+        value: true
+      - key: ADMIN_EMAIL
+        value: admin@themigration.com
+    postDeploy: "python manage.py deploy_setup"
   
   - type: pserv
     name: assessment-db
