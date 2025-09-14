@@ -21,7 +21,7 @@ services:
         value: true
       - key: ADMIN_EMAIL
         value: admin@themigration.com
-    postDeploy: "python manage.py deploy_setup"
+    # postDeploy: "python manage.py deploy_setup"  # Commented out to prevent data loss
   
   - type: pserv
     name: assessment-db
